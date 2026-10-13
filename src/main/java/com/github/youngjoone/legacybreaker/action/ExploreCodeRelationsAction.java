@@ -7,12 +7,14 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.psi.PsiClass;
+import com.github.youngjoone.legacybreaker.session.ExplorationSessionService;
+import com.github.youngjoone.legacybreaker.ui.CodeRelationsToolWindowFactory;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
 
 public final class ExploreCodeRelationsAction extends AnAction {
     @Override
@@ -44,29 +46,9 @@ public final class ExploreCodeRelationsAction extends AnAction {
             return;
         }
 
-        PsiClass owner = method.getContainingClass();
-        String ownerName = owner == null ? null : owner.getQualifiedName();
-        if (ownerName == null) {
-            ownerName = owner == null ? "<unknown>" : owner.getName();
-        }
-        if (ownerName == null) {
-            ownerName = "<anonymous class>";
-        }
-
-        StringBuilder signature = new StringBuilder(ownerName);
-        signature.append('#').append(method.getName()).append('(');
-        PsiParameter[] parameters = method.getParameterList().getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            if (i > 0) {
-                signature.append(", ");
-            }
-            signature.append(parameters[i].getType().getPresentableText());
-        }
-        signature.append(')');
-
-        Messages.showInfoMessage(project,
-                "Selected method: " + signature
-                        + "\n\nInitial milestone: caller/callee graph is not implemented yet.",
-                "Explore Code Relations");
+        ExplorationSessionService.getInstance(project).explore(method);
+        ToolWindow window = ToolWindowManager.getInstance(project)
+                .getToolWindow(CodeRelationsToolWindowFactory.ID);
+        if (window != null) window.activate(null);
     }
 }

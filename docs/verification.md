@@ -1,0 +1,70 @@
+# V0.1 검증 기록
+
+## 실행 환경
+
+- 개인 개발 PC: macOS, Oracle JDK `1.8.0_202`.
+- IntelliJ IDEA Community `2018.3.6`, build `183.6156.11`.
+- 회사 IDE 버전은 미확인. 지원 범위를 183 계열로 제한한다.
+- `build.sh`, `test.sh`는 기존 SDK/JDK만 참조하며 다운로드를 수행하지 않는다.
+
+## 자동 검증 결과
+
+`./test.sh` 종료 코드 **0**. 실제 IDE 로그의 ERROR 항목 **없음**.
+
+| 항목 | 결과 |
+| --- | --- |
+| 실제 JDK 8 컴파일과 JAR 패키징 | 통과 |
+| 간선 방향, 중복 노드/간선 제거 | 통과 |
+| 자기 재귀, 순환 관계 | 통과 |
+| 노드/간선 상한과 dangling edge 방지 | 통과 |
+| Swing 그래프 렌더링 | 통과, 이미지 육안 확인 |
+| 실제 PSI와 인덱스로 Caller/Callee 검색 | 통과 |
+| 메서드 오버로드 구분 | 통과 |
+| 람다/익명 클래스/지역 클래스의 소유 메서드 경계 | 통과 |
+| 외부 라이브러리 노드 식별 | 통과 |
+| 방향별 100개 제한, partial 및 미해결 호출 집계 | 통과 |
+| 최초 한 단계 탐색 후 필요한 노드만 추가 확장 | 통과 |
+| 완료한 방향의 확장 결과 재사용 | 통과 |
+| 플러그인 descriptor의 Action 등록 | 통과 |
+| UI 재생성 후 그래프 유지 | 통과 |
+| Source Navigation으로 실제 소스 에디터 열기 | 통과 |
+| 소스 이동 후 그래프 유지 | 통과 |
+| 저장하지 않은 수정 반영과 캐시 무효화 | 통과 |
+| 앞부분에 줄 추가 후 스마트 포인터 위치 추적 | 통과 |
+| Root 새로고침, 삭제된 Root 처리 | 통과 |
+| 검색 취소, Root 교체 후 이전 작업 결과 차단 | 통과 |
+| 프로젝트 닫기와 서비스 dispose | 통과 |
+
+추가 패키지 검사:
+
+- 모든 제품 클래스는 Java 8 바이트코드 버전 **52**.
+- `plugin.xml`의 Action, 프로젝트 서비스, Tool Window 클래스가 JAR에 포함됨.
+- IntelliJ SDK JAR, 외부 라이브러리, 테스트 클래스가 배포물에 포함되지 않음.
+- 셸 문법 검사와 Git 공백 오류 검사 통과.
+
+산출물:
+
+- 설치용: `build/distributions/legacybreaker-0.1.0.jar`
+- 모델 렌더링: `build/graph-preview.png`
+- 실제 분석 결과 렌더링: `build/integration-preview.png`
+- 통합 테스트 IDE 로그: `build/test-sandbox/log/idea.log`
+
+테스트는 별도 headless IDE의 실제 서비스와 인덱스를 실행한다.
+렌더링 이미지는 그 모델/패널을 그린 것이며, 데스크톱에서 마우스로 직접 조작한 스크린샷은 아니다.
+이 환경에서는 구형 JDK의 macOS 폰트 대체 경고가 출력되었지만 테스트 실패나 IDE ERROR는 없었다.
+
+## 회사 PC 또는 실제 데스크톱에서 확인할 항목
+
+Windows `build.bat` 실행과 실제 GUI 메뉴/클릭 동작은 아직 직접 검증하지 않았다.
+정확한 회사 IDE 버전을 먼저 확인하여 같은 SDK에서 다음을 확인해야 한다.
+
+1. 호환되는 IDE에서 로컬 JAR 설치 후 재시작한다.
+2. Java source root의 `samples/Example.java`에서 `save(int)`에 커서를 두고 우클릭 Action을 실행한다.
+3. Tool Window에 Root, 직접 Caller/Callee가 나타나는지 확인한다.
+4. `write()` 선택 → Expand Callees → `audit()` 추가 → 다시 확장해 순환 관계를 확인한다.
+5. 노드 더블클릭/Enter/Go To Source 이후 그래프로 돌아와 확장 결과가 유지되는지 확인한다.
+6. 노드 드래그, 스크롤, Show Root, 노드 우클릭 메뉴를 확인한다.
+7. 코드를 수정하고 확장하면 snapshot 안내가 나타나는지, Refresh Root가 새 결과를 만드는지 확인한다.
+8. 인덱싱 중 대기, 검색 취소, 프로젝트 닫기, 라이브러리 소스/디컴파일 이동을 확인한다.
+
+2021 또는 최신 IDE에서도 작동한다고 주장하지 않는다. 버전 범위만 넓혀 설치하지 않는다.

@@ -1,0 +1,12 @@
+<idea-plugin>
+    <id>com.github.youngjoone.legacybreaker.tests</id>
+    <name>LegacyBreaker integration tests</name>
+    <version>1</version>
+    <vendor>youngjoone</vendor>
+    <idea-version since-build="183" until-build="183.*"/>
+    <depends>com.github.youngjoone.legacybreaker</depends>
+    <depends>com.intellij.modules.java</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <appStarter implementation="com.github.youngjoone.legacybreaker.IntegrationTestStarter"/>
+    </extensions>
+</idea-plugin>
