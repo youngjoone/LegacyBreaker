@@ -1,11 +1,11 @@
-# Java 8 / 오프라인 MVP V0.1 설계
+# Java 8 / 오프라인 V0.2 설계
 
 ## 조건
 
 - Java 8, 외부 런타임 라이브러리 없음, 네트워크 호출 없음.
 - 임시 SDK 기준: IDEA Community 2018.3.6 (183.6156.11).
 - 회사의 정확한 IDE 버전과 Windows 실행 호환성은 아직 미확정.
-- 향후 변수/Spring/MyBatis/다른 언어/AI 기능은 현재 구현 범위에서 제외한다.
+- 일반 데이터 흐름/Spring 전용/MyBatis/AI는 범위 밖이다. 제한된 JSP 값 추적은 아래 별도 경로로 구현한다.
 
 ## 단계 1~4: 진입점과 로컬 빌드
 
@@ -42,8 +42,8 @@ JDK 8의 `javac`와 `jar`로 빌드하며 IDE JAR는 컴파일 시에만 참조�
 식별자는 파일 URL + 클래스 + 매개변수 타입을 포함한다. 익명/지역 클래스에는 위치도 포함한다.
 소스 변경 후 식별자가 달라질 수 있어 기존 그래프를 snapshot으로 표시하고 Root에서 새로고침한다.
 
-간선은 source/target/type으로 식별한다. 타입은 확장 가능한 문자열이며 현재 `CALLS`를 생성한다.
-방향은 항상 caller → callee다. 중복·재귀·순환을 허용하고 노드/간선 수에 상한을 둔다.
+간선은 source/target/type으로 식별한다. 타입은 확장 가능한 문자열이며 Java 관계에서는 `CALLS`를 생성한다.
+Java 관계 방향은 caller → callee다. 중복·재귀·순환을 허용하고 노드/간선 수에 상한을 둔다.
 스마트 PSI 포인터는 `AnalysisResult`와 프로젝트 세션이 소유하며 그래프 모델에는 넣지 않는다.
 
 ## 단계 8: UI와 탐색 상태
@@ -81,6 +81,26 @@ PSI 변경과 프로젝트 루트 변경을 구독한다. 변화가 있으면 �
 자동으로 전체 프로젝트를 재분석하지 않는다. 초기 버전에서는 관련 없는 파일 변경도 무효화한다.
 
 서비스 dispose 때 작업을 취소하고 실행기를 종료한다. UI dispose 때 세션 리스너를 해제한다.
+
+## V0.2: JSP 값 출처 탐색
+
+`TraceJspValueAction` → `JspTraceService` → `JspValueAnalyzer`로 진행한다.
+`JspSource`는 JSP 블록을 추출해 위치 대응표와 임시 Java 파일을 만든다.
+JS 선언 바인딩은 문자열/주석을 가린 뒤 한 번 추출해 재사용한다. Ultimate 언어 API는 쓰지 않는다.
+`LocalValue`가 Java PSI에서 지역 변수의 보수적인 출처를 판정한다. 재대입/루프 등은 중단한다.
+
+`RequestWriterFinder`는 속성 키의 단어 인덱스로 후보 파일을 찾고, PSI에서 문자열 키와
+Servlet request 수신 타입을 확인한다. 문자열 화면 경로는 후보 필터/근거로만 쓴다.
+`ValueTrace`의 typed edge는 출처 → 사용처 방향이며 요청 경계를 넘는 연결은 `CANDIDATE_ATTRIBUTE`다.
+그래프 모델은 계속 JDK에만 의존하고, 소스 위치/스마트 포인터는 결과와 세션이 관리한다.
+
+별도 `JspTraceService`가 취소 가능한 smart-mode 읽기 작업과 세대 번호를 관리한다.
+분석 결과를 EDT에서 게시하기 전에 코드·루트·문서 버전을 검사한다.
+JSP 위치는 RangeMarker, Java 위치는 스마트 PSI 포인터로 추적한다.
+`JspTracePanel`은 공통 Swing 그래프를 재사용하고 후보 연결을 점선으로 표시한다.
+기존 메서드 탐색으로 넘어가도 JSP 그래프는 유지한다. 두 창 모두 IDE 종료 후 저장하지 않는다.
+
+정확한 제한과 사용 예는 [JSP 역추적](jsp-tracing.md)에 기록한다.
 
 ## 검증과 근거
 

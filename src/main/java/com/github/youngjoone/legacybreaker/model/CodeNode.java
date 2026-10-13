@@ -9,9 +9,15 @@ public final class CodeNode {
     public final String filePath;
     public final int line;
     public final boolean external;
+    public final String description;
 
     public CodeNode(String id, String type, String name, String className,
                     String filePath, int line, boolean external) {
+        this(id, type, name, className, filePath, line, external, "");
+    }
+
+    public CodeNode(String id, String type, String name, String className,
+                    String filePath, int line, boolean external, String description) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -19,5 +25,6 @@ public final class CodeNode {
         this.filePath = filePath;
         this.line = line;
         this.external = external;
+        this.description = description;
     }
 }

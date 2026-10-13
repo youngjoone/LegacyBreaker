@@ -24,6 +24,7 @@ public final class GraphCanvas extends JComponent {
     private Point nodeStart;
     private String dragging;
     private boolean moved;
+    private String emptyMessage = "Explore a Java method from the editor context menu.";
 
     public GraphCanvas(CodeGraph graph, Consumer<String> select, Runnable navigate, Consumer<MouseEvent> popup) {
         this.graph = graph;
@@ -125,6 +126,8 @@ public final class GraphCanvas extends JComponent {
                 point.y + originY - 20, WIDTH + 40, HEIGHT + 40));
     }
 
+    public void setEmptyMessage(String message) { emptyMessage = message; }
+
     private String hit(Point point) {
         for (Map.Entry<String, Point> entry : positions.entrySet()) {
             Point p = entry.getValue();
@@ -135,7 +138,7 @@ public final class GraphCanvas extends JComponent {
 
     @Override public String getToolTipText(MouseEvent event) {
         CodeNode node = graph.node(hit(event.getPoint()));
-        return node == null ? null : "Method: " + node.className + "#" + node.name + " | " + node.filePath
+        return node == null ? null : node.type + ": " + node.className + "#" + node.name + " | " + node.filePath
                 + (node.line > 0 ? ":" + node.line : "") + (node.external ? " [library: terminal node]" : "");
     }
 
@@ -152,7 +155,7 @@ public final class GraphCanvas extends JComponent {
             g.setFont(UIManager.getFont("Label.font"));
             if (positions.isEmpty()) {
                 g.setColor(foreground);
-                g.drawString("Explore a Java method from the editor context menu.", 30, 45);
+                g.drawString(emptyMessage, 30, 45);
                 return;
             }
             g.translate(originX, originY);
@@ -185,6 +188,10 @@ public final class GraphCanvas extends JComponent {
     }
 
     private void paintEdge(Graphics2D g, CodeEdge edge) {
+        boolean candidate = edge.type.startsWith("CANDIDATE");
+        g.setColor(candidate ? new Color(180, 130, 60) : new Color(120, 135, 155));
+        g.setStroke(candidate ? new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10, new float[]{5, 4}, 0)
+                : new BasicStroke(1.5f));
         Point from = positions.get(edge.source), to = positions.get(edge.target);
         if (from == null || to == null) return;
         if (edge.source.equals(edge.target)) {
@@ -200,6 +207,10 @@ public final class GraphCanvas extends JComponent {
         double c1 = x1 + (right ? bend : -bend), c2 = x2 + (right ? -bend : bend);
         g.draw(new CubicCurve2D.Double(x1, y1, c1, y1, c2, y2, x2, y2));
         arrow(g, x2, y2, right ? 0 : Math.PI);
+        if (!CodeEdge.CALLS.equals(edge.type)) {
+            String label = candidate ? "candidate" : edge.type.equals("OUTPUTS") ? "output" : "value";
+            g.drawString(label, (int) ((x1 + x2) / 2 - g.getFontMetrics().stringWidth(label) / 2), (int) ((y1 + y2) / 2 - 8));
+        }
     }
 
     private static void arrow(Graphics2D g, double x, double y, double angle) {

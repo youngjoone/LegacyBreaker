@@ -53,6 +53,7 @@ public final class IntegrationTestStarter extends ApplicationStarterEx {
                 ProgressManager.getInstance().runProcess(
                         () -> ApplicationManager.getApplication().runReadAction(this::analysisTests),
                         new EmptyProgressIndicator());
+                JspIntegrationTest.run(project);
                 sessionTests();
                 System.out.println("PASS: real PSI, reference index, lazy expansion, navigation, stale refresh and cancellation");
                 System.exit(0);
@@ -68,6 +69,7 @@ public final class IntegrationTestStarter extends ApplicationStarterEx {
         Files.createDirectories(folder.resolve("src"));
         Files.copy(Paths.get(System.getProperty("legacybreaker.test.sample")), folder.resolve("src/Example.java"),
                 StandardCopyOption.REPLACE_EXISTING);
+        JspIntegrationTest.fixtures(folder);
         edt(() -> {
             project = ProjectManagerEx.getInstanceEx().newProject("LegacyBreaker Test", folder.toString(), false, false);
             check(project != null, "Project created");

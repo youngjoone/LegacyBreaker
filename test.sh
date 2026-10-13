@@ -8,13 +8,15 @@ mkdir -p build/test-classes
     src/test/java/com/github/youngjoone/legacybreaker/*.java
 "$LEGACYBREAKER_JDK/bin/java" -Djava.awt.headless=true -cp "build/classes:build/test-classes" \
     com.github.youngjoone.legacybreaker.ModelTest
+"$LEGACYBREAKER_JDK/bin/java" -Djava.awt.headless=true -cp "build/classes:build/test-classes" \
+    com.github.youngjoone.legacybreaker.JspSourceTest
 
 # The integration suite uses the actual IDE and its indexes, in an isolated sandbox.
 # It does not install anything into the user's normal IntelliJ profile.
 test_sandbox="$PWD/build/test-sandbox"
 rm -rf "$test_sandbox"
 mkdir -p "$test_sandbox/plugins/legacybreaker/lib" "$test_sandbox/plugins/tests/lib" "$test_sandbox/config"
-cp build/distributions/legacybreaker-0.1.0.jar "$test_sandbox/plugins/legacybreaker/lib/"
+cp build/distributions/legacybreaker-0.2.0.jar "$test_sandbox/plugins/legacybreaker/lib/"
 cp -R src/test/resources/. build/test-classes/
 "$LEGACYBREAKER_JDK/bin/jar" cf "$test_sandbox/plugins/tests/lib/tests.jar" -C build/test-classes .
 "$LEGACYBREAKER_JDK/bin/java" -Xmx1024m -Djava.awt.headless=true -Didea.is.internal=true \
@@ -24,6 +26,7 @@ cp -R src/test/resources/. build/test-classes/
     -Dlegacybreaker.test.project="$test_sandbox/project" -Dlegacybreaker.test.sample="$PWD/samples/Example.java" \
     -Dlegacybreaker.test.jdk="$LEGACYBREAKER_JDK" \
     -Dlegacybreaker.test.preview="$PWD/build/integration-preview.png" \
+    -Dlegacybreaker.test.jsp.preview="$PWD/build/jsp-preview.png" \
     -cp "$LEGACYBREAKER_JDK/lib/tools.jar:$LEGACYBREAKER_IDEA/lib/*" com.intellij.idea.Main legacybreaker-test
 if grep -q ' ERROR - ' "$test_sandbox/log/idea.log"; then
     echo "FAIL: IDE logged errors; inspect $test_sandbox/log/idea.log" >&2

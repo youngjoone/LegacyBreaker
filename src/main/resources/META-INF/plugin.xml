@@ -1,9 +1,9 @@
 <idea-plugin>
     <id>com.github.youngjoone.legacybreaker</id>
     <name>Code Relationship Explorer</name>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <vendor>youngjoone</vendor>
-    <description>Offline Java caller/callee graphs with lazy expansion and source navigation.</description>
+    <description>Offline Java caller/callee graphs and JSP value tracing to candidate request attribute writers, with source navigation.</description>
 
     <!-- Provisional target, not a claim of compatibility with the company's IDE. -->
     <idea-version since-build="183" until-build="183.*"/>
@@ -14,9 +14,18 @@
         <projectService serviceImplementation="com.github.youngjoone.legacybreaker.session.ExplorationSessionService"/>
         <toolWindow id="Code Relations" anchor="bottom"
                     factoryClass="com.github.youngjoone.legacybreaker.ui.CodeRelationsToolWindowFactory"/>
+        <projectService serviceImplementation="com.github.youngjoone.legacybreaker.jsp.JspTraceService"/>
+        <toolWindow id="JSP Value Origins" anchor="bottom"
+                    factoryClass="com.github.youngjoone.legacybreaker.jsp.JspTraceToolWindowFactory"/>
     </extensions>
 
     <actions>
+        <action id="LegacyBreaker.TraceJspValue"
+                class="com.github.youngjoone.legacybreaker.action.TraceJspValueAction"
+                text="Trace JSP Value Origin"
+                description="Trace a JSP scriptlet value to candidate Java request attribute writers">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
         <action id="LegacyBreaker.ExploreCodeRelations"
                 class="com.github.youngjoone.legacybreaker.action.ExploreCodeRelationsAction"
                 text="Explore Code Relations"

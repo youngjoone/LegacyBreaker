@@ -1,7 +1,7 @@
 # LegacyBreaker — Code Relationship Explorer
 
-Java 8로 구현한 IntelliJ IDEA용 오프라인 Java 메서드 관계 탐색 플러그인.
-**V0.1은 Caller/Callee 그래프, 소스 이동, 노드별 확장을 제공한다.**
+Java 8로 구현한 IntelliJ IDEA용 오프라인 Java 메서드 관계 및 JSP 값 출처 탐색 플러그인.
+**V0.2는 기존 Caller/Callee 그래프에 JSP → request 속성 → 자바 작성자 후보 역추적을 추가한다.**
 
 회사 IDE 버전은 아직 미확인이므로 **IntelliJ IDEA 2018.3 (빌드 183)만 임시 지원**한다.
 그보다 오래되거나 새로운 IDE는 정확한 버전을 확인하고 별도로 맞춰야 한다.
@@ -9,7 +9,7 @@ Java 8로 구현한 IntelliJ IDEA용 오프라인 Java 메서드 관계 탐색 �
 ## 사용 방법
 
 1. 호환되는 IDEA의 `Settings → Plugins → Install Plugin from Disk`에서
-   `build/distributions/legacybreaker-0.1.0.jar`를 설치하고 IDE를 재시작한다.
+   `build/distributions/legacybreaker-0.2.0.jar`를 설치하고 IDE를 재시작한다.
    이 JAR는 독립 실행 프로그램이 아니므로 더블클릭/`java -jar`로 실행하지 않는다.
 2. Java 프로젝트를 열고 메서드 선언 또는 본문에 커서를 둔다.
 3. 에디터 우클릭 → **Explore Code Relations**를 선택한다.
@@ -35,7 +35,20 @@ Root는 녹색 테두리, 선택 노드는 파란색 테두리다. 노드를 끌
 지정하고 `save(int)`에서 시작하면 오버로드·재귀·라이브러리 호출을 볼 수 있다.
 `Store.write()`를 확장하면 `audit()`가 추가된다.
 
-## 분석 범위와 한계
+## JSP의 JS 변수에서 역추적하기
+
+JSP의 `var status = "<%= userStatus %>";`에서 변수 선언이나 `<%= ... %>`에 커서를 두고
+우클릭 → **Trace JSP Value Origin**을 실행한다. **JSP Value Origins** 창에
+JS 변수 → JSP 출력 → 자바 변수 → `request.getAttribute("키")` → `setAttribute("키", 값)` 후보가 나타난다.
+
+노드 더블클릭으로 소스에 이동하고, Java 노드의 **Explore Method Calls**로 기존 메서드 그래프를 이어서 탐색한다.
+점선은 작성자 후보이며 해당 요청의 실제 실행 경로를 보장하지 않는다. 조건부 재대입 등은 경계에서 멈춘다.
+이번 단계는 스크립틀릿과 문자열 키의 request 속성을 지원한다. JSTL/EL, Model/ModelAndView,
+include, 동적 키, JS 임의 사용 위치 및 실행 중 실제 값은 지원하지 않는다.
+
+예제와 정확한 범위: [JSP 역추적 사용법](docs/jsp-tracing.md).
+
+## Java 메서드 분석 범위와 한계
 
 - Java의 직접적인 메서드 호출을 PSI와 참조 인덱스로 분석한다. 프로젝트 소스 루트 설정이 필요하다.
 - Caller는 프로젝트 소스에서 검색한다. 테스트 소스도 포함한다.
@@ -50,7 +63,8 @@ Root는 녹색 테두리, 선택 노드는 파란색 테두리다. 노드를 끌
 - 한 번의 방향별 확장은 최대 100개 메서드, 그래프는 최대 400개 노드/2,000개 간선이다.
   검색은 방문 20,000회와 약 5초의 협력적 제한도 적용한다. 플랫폼 내부 인덱스 작업 중에는
   이 시간을 넘을 수 있다. 제한에 걸리면 **partial**로 표시한다. 전체 결과 페이지 기능은 없다.
-- AI, Spring 전용 분석, MyBatis/SQL, 변수 데이터 흐름, 다른 언어, 전체 프로젝트 그래프는 구현하지 않는다.
+- AI, Spring 전용 분석, MyBatis/SQL, 일반적인 변수 데이터 흐름, 전체 프로젝트 그래프는 구현하지 않는다.
+  JSP 값 추적의 제한된 지원 범위는 위 별도 사용법을 따른다.
 
 ## 네트워크 없는 빌드
 
@@ -76,7 +90,7 @@ export LEGACYBREAKER_IDEA="/path/to/intellij"
 ```
 
 macOS IDE 경로는 앱의 `Contents`, JDK 경로는 JDK의 `Contents/Home`을 지정한다.
-결과물은 `build/distributions/legacybreaker-0.1.0.jar`다.
+결과물은 `build/distributions/legacybreaker-0.2.0.jar`다.
 
 IDE 편집 시 소스 루트는 `src/main/java`, 리소스 루트는 `src/main/resources`다.
 기존 Plugin DevKit이 있으면 설치된 IDEA를 SDK로 지정해 편집할 수 있다.
@@ -96,7 +110,8 @@ Java 8 문법 설정만으로 Java 11 기반 SDK를 JDK 8에서 사용할 수는
   탐색 상태, 방향별 확장 재사용, 소스 이동, 변경 감지, 새로고침, 취소도 검사한다.
 - 통합 테스트는 `build/test-sandbox`에 별도 IDE 설정/인덱스를 만든다. 평소 IDE 설정은 변경하지 않는다.
   테스트 전용 starter와 테스트 JAR는 배포물에 포함하지 않는다.
-- 그래프 렌더링 결과: `build/graph-preview.png`.
+- JSP 추출, 자바 작성자 후보, 잘못된 연결 배제, 소스 이동, 변경 감지, 새로고침, 취소를 검사한다.
+- 그래프 렌더링 결과: `build/graph-preview.png`, `build/integration-preview.png`, `build/jsp-preview.png`.
 
 정확한 실행 결과와 수동 확인 목록은 [docs/verification.md](docs/verification.md)에 기록한다.
 회사 버전/Windows에서의 실제 설치와 클릭 동작은 해당 환경에서 별도 확인이 필요하다.

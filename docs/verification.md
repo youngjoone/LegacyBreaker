@@ -1,4 +1,4 @@
-# V0.1 검증 기록
+# V0.2 검증 기록
 
 ## 실행 환경
 
@@ -34,6 +34,16 @@
 | Root 새로고침, 삭제된 Root 처리 | 통과 |
 | 검색 취소, Root 교체 후 이전 작업 결과 차단 | 통과 |
 | 프로젝트 닫기와 서비스 dispose | 통과 |
+| JSP 출력식·직접 JS 선언 연결과 원본 위치 대응 | 통과 |
+| JSP/JS 주석, 결합 문자열, 임의 JS 사용 위치 배제 | 통과 |
+| request 속성 읽기 → Java 작성자 후보 연결 | 통과 |
+| Servlet 수신 타입, 다른 화면·session·동명 일반 메서드 배제 | 통과 |
+| 목적지 미확인 후보와 점선 간선 표시 | 통과 |
+| 동적 키·조건부/괄호 재대입·루프에서 추적 중단 | 통과 |
+| 지역 변수의 단일 직접 대입과 메서드 출처 연결 | 통과 |
+| JSP Action 등록, 백그라운드 분석, Java/JSP 소스 이동 | 통과 |
+| 메서드 탐색으로 전환해도 JSP 그래프 유지 | 통과 |
+| JSP 편집 후 위치 추적·snapshot·새로고침·취소/결과 교체 | 통과 |
 
 추가 패키지 검사:
 
@@ -44,14 +54,19 @@
 
 산출물:
 
-- 설치용: `build/distributions/legacybreaker-0.1.0.jar`
+- 설치용: `build/distributions/legacybreaker-0.2.0.jar`
 - 모델 렌더링: `build/graph-preview.png`
-- 실제 분석 결과 렌더링: `build/integration-preview.png`
+- 실제 분석 결과 렌더링: `build/integration-preview.png`, `build/jsp-preview.png`
 - 통합 테스트 IDE 로그: `build/test-sandbox/log/idea.log`
 
 테스트는 별도 headless IDE의 실제 서비스와 인덱스를 실행한다.
 렌더링 이미지는 그 모델/패널을 그린 것이며, 데스크톱에서 마우스로 직접 조작한 스크린샷은 아니다.
-이 환경에서는 구형 JDK의 macOS 폰트 대체 경고가 출력되었지만 테스트 실패나 IDE ERROR는 없었다.
+이 환경에서는 구형 JDK의 macOS 폰트 대체 경고가 출력되었지만 최종 실행에서 테스트 실패나 IDE ERROR는 없었다.
+
+JSP 소스 이동 테스트는 테스트 프로젝트의 자동 백그라운드 에디터 검사를 비활성화한다.
+2018 SDK의 기본 파일 템플릿 검사가 최신 macOS에서 구형 JNA로 CoreFoundation을 불러오다
+오류를 기록하는 현상을 피하기 위한 **테스트 환경 설정**이다. 실제 PSI·인덱스 검색과 소스 이동은 실행한다.
+제품 코드에서는 IDE 검사 설정을 바꾸지 않는다. 회사 Windows와 구형 IDE의 실제 GUI 검증을 대체하지 않는다.
 
 ## 회사 PC 또는 실제 데스크톱에서 확인할 항목
 
@@ -66,5 +81,9 @@ Windows `build.bat` 실행과 실제 GUI 메뉴/클릭 동작은 아직 직접 �
 6. 노드 드래그, 스크롤, Show Root, 노드 우클릭 메뉴를 확인한다.
 7. 코드를 수정하고 확장하면 snapshot 안내가 나타나는지, Refresh Root가 새 결과를 만드는지 확인한다.
 8. 인덱싱 중 대기, 검색 취소, 프로젝트 닫기, 라이브러리 소스/디컴파일 이동을 확인한다.
+
+9. 프로젝트의 기존 Servlet API를 연결하고 `samples/jsp/status.jsp`에서 `status` 선언의 **Trace JSP Value Origin**을 실행한다.
+10. request 읽기와 Controller 후보를 확인하고 점선 노드 설명, 소스 이동, Explore Method Calls를 확인한다.
+11. JSP 수정 후 Refresh Trace, 지원하지 않는 식의 경계 안내, 긴 그래프 스크롤을 확인한다.
 
 2021 또는 최신 IDE에서도 작동한다고 주장하지 않는다. 버전 범위만 넓혀 설치하지 않는다.

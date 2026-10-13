@@ -17,17 +17,35 @@ public final class CodeGraph {
     private long resetVersion;
 
     public void reset(CodeNode root) {
-        resetVersion++;
-        nodes.clear();
-        edges.clear();
+        clear();
         rootId = root.id;
         nodes.put(root.id, root);
     }
 
+    public void clear() {
+        resetVersion++;
+        nodes.clear();
+        edges.clear();
+        rootId = null;
+    }
+
+    public void replaceWith(CodeGraph snapshot) {
+        if (snapshot == this) return;
+        clear();
+        rootId = snapshot.rootId;
+        nodes.putAll(snapshot.nodes);
+        edges.addAll(snapshot.edges);
+    }
+
     /** Adds a neighbor and edge atomically; no dangling or duplicate edges. */
     public boolean connect(String center, CodeNode neighbor, Direction direction) {
+        return connect(center, neighbor, direction, CodeEdge.CALLS);
+    }
+
+    public boolean connect(String center, CodeNode neighbor, Direction direction, String type) {
         if (!nodes.containsKey(center)) throw new IllegalArgumentException("Unknown center");
-        CodeEdge edge = direction.edge(center, neighbor.id);
+        CodeEdge call = direction.edge(center, neighbor.id);
+        CodeEdge edge = new CodeEdge(call.source, call.target, type);
         if ((!nodes.containsKey(neighbor.id) && nodes.size() >= MAX_NODES)
                 || (!edges.contains(edge) && edges.size() >= MAX_EDGES)) return false;
         nodes.put(neighbor.id, neighbor);

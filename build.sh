@@ -26,12 +26,13 @@ esac
 # Only project output is cleaned. IDE libraries are compile-time dependencies.
 rm -rf build/classes
 mkdir -p build/classes build/distributions
-rm -f build/distributions/legacybreaker-0.1.0.jar
+rm -f build/distributions/legacybreaker-0.2.0.jar
 "$LEGACYBREAKER_JDK/bin/javac" -encoding UTF-8 -source 1.8 -target 1.8 -proc:none \
     -classpath "$LEGACYBREAKER_IDEA/lib/*" \
     -sourcepath src/main/java -d build/classes \
-    src/main/java/com/github/youngjoone/legacybreaker/action/ExploreCodeRelationsAction.java
+    src/main/java/com/github/youngjoone/legacybreaker/action/ExploreCodeRelationsAction.java \
+    src/main/java/com/github/youngjoone/legacybreaker/action/TraceJspValueAction.java
 cp -R src/main/resources/. build/classes/
-"$LEGACYBREAKER_JDK/bin/jar" cf build/distributions/legacybreaker-0.1.0.jar \
+"$LEGACYBREAKER_JDK/bin/jar" cf build/distributions/legacybreaker-0.2.0.jar \
     -C build/classes .
-echo "Built build/distributions/legacybreaker-0.1.0.jar"
+echo "Built build/distributions/legacybreaker-0.2.0.jar"
