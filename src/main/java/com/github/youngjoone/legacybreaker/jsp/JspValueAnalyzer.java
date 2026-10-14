@@ -57,8 +57,9 @@ public final class JspValueAnalyzer {
                 int declaration = source.sourceOffset(variable.getTextOffset());
                 if (declaration < 0) return;
                 PsiExpression origin = LocalValue.origin(variable, expression);
+                //4차수정: 루프/람다 경계에서 중단되는 경우도 노드 설명에 표시한다.
                 CodeNode node = result.node(file, declaration, "JSP_VARIABLE", variable.getName(), "JSP Java variable",
-                        origin == null ? "Reassigned, conditional or missing initializer: reaching value is not determined."
+                        origin == null ? "Reassigned, conditional, loop/lambda or missing initializer: reaching value is not determined."
                                 : "Direct local value source; casts and parentheses are unwrapped.", null);
                 result.upstream(downstream, node, "ASSIGNS");
                 if (origin != null) traceLocal(result, file, source, origin, node.id, visited, depth + 1);

@@ -1,4 +1,6 @@
-# V0.2 검증 기록
+# V0.2.1 검증 기록
+
+<!--4차수정: 세 가지 오류의 회귀 검사와 수정판 산출물 기록.-->
 
 ## 실행 환경
 
@@ -37,8 +39,13 @@
 | JSP 출력식·직접 JS 선언 연결과 원본 위치 대응 | 통과 |
 | JSP/JS 주석, 결합 문자열, 임의 JS 사용 위치 배제 | 통과 |
 | request 속성 읽기 → Java 작성자 후보 연결 | 통과 |
-| Servlet 수신 타입, 다른 화면·session·동명 일반 메서드 배제 | 통과 |
+| Servlet 수신 타입 검증, session·동명 일반 메서드 배제 | 통과 |
+| 화면 힌트 일치 표시 및 불일치 작성자의 미확인 후보 유지 | 통과 |
 | 목적지 미확인 후보와 점선 간선 표시 | 통과 |
+| 같은 변수의 두 사용처 분리와 재대입 후 초기값 오연결 방지 | 통과 |
+| 자바 변수 스마트 포인터가 해당 사용 위치를 가리킴 | 통과 |
+| JSP의 람다/중첩 람다 및 자바 람다 로컬 출처 중단 | 통과 |
+| 일반 문자열 반환, 동적 반환 혼합, 다른 dispatcher 힌트의 후보 유지 | 통과 |
 | 동적 키·조건부/괄호 재대입·루프에서 추적 중단 | 통과 |
 | 지역 변수의 단일 직접 대입과 메서드 출처 연결 | 통과 |
 | JSP Action 등록, 백그라운드 분석, Java/JSP 소스 이동 | 통과 |
@@ -54,7 +61,7 @@
 
 산출물:
 
-- 설치용: `build/distributions/legacybreaker-0.2.0.jar`
+- 설치용: `build/distributions/legacybreaker-0.2.1.jar`
 - 모델 렌더링: `build/graph-preview.png`
 - 실제 분석 결과 렌더링: `build/integration-preview.png`, `build/jsp-preview.png`
 - 통합 테스트 IDE 로그: `build/test-sandbox/log/idea.log`

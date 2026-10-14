@@ -3,13 +3,17 @@
 Java 8로 구현한 IntelliJ IDEA용 오프라인 Java 메서드 관계 및 JSP 값 출처 탐색 플러그인.
 **V0.2는 기존 Caller/Callee 그래프에 JSP → request 속성 → 자바 작성자 후보 역추적을 추가한다.**
 
+<!--4차수정: 수정판 안내와 수동 적용 위치.-->
+V0.2.1은 재대입 경로 혼합, 람다 초기값 오판, 작성자 후보 누락을 수정한다.
+수정 코드에는 `//4차수정` 표시가 있다. [4차 수정 적용 목록](docs/revision-4.md)을 참고한다.
+
 회사 IDE 버전은 아직 미확인이므로 **IntelliJ IDEA 2018.3 (빌드 183)만 임시 지원**한다.
 그보다 오래되거나 새로운 IDE는 정확한 버전을 확인하고 별도로 맞춰야 한다.
 
 ## 사용 방법
 
 1. 호환되는 IDEA의 `Settings → Plugins → Install Plugin from Disk`에서
-   `build/distributions/legacybreaker-0.2.0.jar`를 설치하고 IDE를 재시작한다.
+   `build/distributions/legacybreaker-0.2.1.jar`를 설치하고 IDE를 재시작한다.
    이 JAR는 독립 실행 프로그램이 아니므로 더블클릭/`java -jar`로 실행하지 않는다.
 2. Java 프로젝트를 열고 메서드 선언 또는 본문에 커서를 둔다.
 3. 에디터 우클릭 → **Explore Code Relations**를 선택한다.
@@ -90,7 +94,7 @@ export LEGACYBREAKER_IDEA="/path/to/intellij"
 ```
 
 macOS IDE 경로는 앱의 `Contents`, JDK 경로는 JDK의 `Contents/Home`을 지정한다.
-결과물은 `build/distributions/legacybreaker-0.2.0.jar`다.
+결과물은 `build/distributions/legacybreaker-0.2.1.jar`다.
 
 IDE 편집 시 소스 루트는 `src/main/java`, 리소스 루트는 `src/main/resources`다.
 기존 Plugin DevKit이 있으면 설치된 IDEA를 SDK로 지정해 편집할 수 있다.

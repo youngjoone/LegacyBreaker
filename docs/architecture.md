@@ -87,10 +87,13 @@ PSI 변경과 프로젝트 루트 변경을 구독한다. 변화가 있으면 �
 `TraceJspValueAction` → `JspTraceService` → `JspValueAnalyzer`로 진행한다.
 `JspSource`는 JSP 블록을 추출해 위치 대응표와 임시 Java 파일을 만든다.
 JS 선언 바인딩은 문자열/주석을 가린 뒤 한 번 추출해 재사용한다. Ultimate 언어 API는 쓰지 않는다.
-`LocalValue`가 Java PSI에서 지역 변수의 보수적인 출처를 판정한다. 재대입/루프 등은 중단한다.
+`LocalValue`가 Java PSI에서 지역 변수의 보수적인 출처를 판정한다. 재대입/루프/람다 등은 중단한다.
 
 `RequestWriterFinder`는 속성 키의 단어 인덱스로 후보 파일을 찾고, PSI에서 문자열 키와
-Servlet request 수신 타입을 확인한다. 문자열 화면 경로는 후보 필터/근거로만 쓴다.
+Servlet request 수신 타입을 확인한다. 문자열 화면 경로는 힌트로 표시하며, 불일치만으로 제외하지 않는다.
+<!--4차수정: 사용 위치별 그래프 노드와 불확실한 출처의 경계 처리.-->
+자바 로컬 변수 노드는 선언이 아닌 사용 위치로 식별하고 해당 위치에 스마트 포인터를 만든다.
+같은 변수를 재대입한 전후의 출처가 하나의 노드에 섞이지 않는다. 람다 내부 로컬 출처는 중단한다.
 `ValueTrace`의 typed edge는 출처 → 사용처 방향이며 요청 경계를 넘는 연결은 `CANDIDATE_ATTRIBUTE`다.
 그래프 모델은 계속 JDK에만 의존하고, 소스 위치/스마트 포인터는 결과와 세션이 관리한다.
 

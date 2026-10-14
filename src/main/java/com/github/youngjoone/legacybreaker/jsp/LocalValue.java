@@ -18,8 +18,9 @@ public final class LocalValue {
     public static PsiExpression origin(PsiLocalVariable variable, PsiElement use) {
         PsiMethod method = PsiTreeUtil.getParentOfType(variable, PsiMethod.class);
         if (method == null || method.getBody() == null) return null;
+        //4차수정: 람다 내부는 재대입 검사가 생략되므로 초기값으로 연결하지 않고 경계에서 중단한다.
         for (PsiElement parent = use; parent != null && parent != method; parent = parent.getParent())
-            if (parent instanceof PsiLoopStatement) return null;
+            if (parent instanceof PsiLoopStatement || parent instanceof PsiLambdaExpression) return null;
         List<PsiElement> writes = new ArrayList<>();
         method.getBody().accept(new JavaRecursiveElementWalkingVisitor() {
             @Override public void visitReferenceExpression(PsiReferenceExpression reference) {

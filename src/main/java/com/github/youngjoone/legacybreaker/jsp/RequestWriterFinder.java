@@ -67,8 +67,8 @@ public final class RequestWriterFinder {
 
     private static void addWriter(VirtualFile jsp, ValueTrace result, PsiMethodCallExpression call,
                                   PsiMethod method, PsiExpression value) {
+        //4차수정: 화면 힌트가 달라도 후보를 유지한다. 기존 evidence == null 제외문은 삭제한다.
         String evidence = viewEvidence(jsp, method);
-        if (evidence == null) return; // All recognized literal view names point elsewhere.
         VirtualFile file = call.getContainingFile().getVirtualFile();
         PsiClass owner = method.getContainingClass();
         String context = (owner == null ? "Java" : owner.getName()) + "." + method.getName() + "()";
@@ -116,7 +116,8 @@ public final class RequestWriterFinder {
             if (jspPath.endsWith(suffix)) return "Literal view/path hint matches " + destination
                     + "; ViewResolver configuration and dispatch execution are not checked.";
         }
-        return null;
+        //4차수정: 일반 반환 문자열을 화면명으로 단정하지 않고 목적지 미확인 후보로 남긴다.
+        return "No matching literal view/path hint; destination unconfirmed. Return strings may be data rather than view names.";
     }
 
     private static void traceJava(ValueTrace result, VirtualFile file, PsiExpression raw, String downstream,
@@ -128,8 +129,9 @@ public final class RequestWriterFinder {
             PsiElement variable = ((PsiReferenceExpression) expression).resolve();
             if (variable instanceof PsiLocalVariable) {
                 PsiExpression origin = LocalValue.origin((PsiLocalVariable) variable, expression);
-                CodeNode node = result.node(file, variable.getTextOffset(), "JAVA_VARIABLE", ((PsiLocalVariable) variable).getName(),
-                        "Java local value", origin == null ? "Conditional/reassigned or unknown origin; stopped here." : "Direct initializer or straight-line assignment.", variable);
+                //4차수정: 선언 위치 대신 사용 위치로 노드와 소스 이동을 구분하여 재대입 전후의 경로 혼합을 막는다.
+                CodeNode node = result.node(file, expression.getTextOffset(), "JAVA_VARIABLE", ((PsiLocalVariable) variable).getName(),
+                        "Java local value", origin == null ? "Conditional/reassigned, loop/lambda or unknown origin; stopped here." : "Direct initializer or straight-line assignment.", expression);
                 if (result.upstream(downstream, node, "VALUE_FROM") && origin != null) traceJava(result, file, origin, node.id, visited, depth + 1);
                 return;
             }

@@ -1,7 +1,8 @@
 <idea-plugin>
     <id>com.github.youngjoone.legacybreaker</id>
     <name>Code Relationship Explorer</name>
-    <version>0.2.0</version>
+    <!--4차수정: 역추적 정확성 오류 세 건을 수정한 버전.-->
+    <version>0.2.1</version>
     <vendor>youngjoone</vendor>
     <description>Offline Java caller/callee graphs and JSP value tracing to candidate request attribute writers, with source navigation.</description>
 
