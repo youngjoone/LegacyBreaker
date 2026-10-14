@@ -1,4 +1,4 @@
-# V0.2.1 검증 기록
+# V0.3.0 검증 기록
 
 <!--4차수정: 세 가지 오류의 회귀 검사와 수정판 산출물 기록.-->
 
@@ -6,7 +6,7 @@
 
 - 개인 개발 PC: macOS, Oracle JDK `1.8.0_202`.
 - IntelliJ IDEA Community `2018.3.6`, build `183.6156.11`.
-- 회사 IDE 버전은 미확인. 지원 범위를 183 계열로 제한한다.
+- 사용자가 회사 IDE 버전 일치를 확인했다. 지원 범위는 183 계열이다.
 - `build.sh`, `test.sh`는 기존 SDK/JDK만 참조하며 다운로드를 수행하지 않는다.
 
 ## 자동 검증 결과
@@ -52,6 +52,21 @@
 | 메서드 탐색으로 전환해도 JSP 그래프 유지 | 통과 |
 | JSP 편집 후 위치 추적·snapshot·새로고침·취소/결과 교체 | 통과 |
 
+<!--4차수정: 변수 탐색 자동 검증 항목 추가.-->
+변수 탐색 검증:
+
+| 항목 | 결과 |
+| --- | --- |
+| 선언/사용 위치에서 같은 변수 식별, 다른 동명 선언 배제 | 통과 |
+| 지역 변수·매개변수·필드, 다른 Java 파일의 필드 참조 | 통과 |
+| 초기값·단순/괄호 대입·복합 대입·전후 증감 구분 | 통과 |
+| 배열 요소 변경과 변수 재대입, 논리 부정 읽기 구분 | 통과 |
+| foreach 입력, 람다 캡처 및 람다 내부 참조 | 통과 |
+| 200개 참조 상한과 PARTIAL 표시 | 통과 |
+| Action 등록, All/Reads/Changes 필터, UI 재생성 후 유지 | 통과 |
+| 사용 위치 이동, 편집 후 스마트 포인터, snapshot·새로고침 | 통과 |
+| 취소 후 새 변수 선택, 삭제된 선언·잘못된 커서 처리 | 통과 |
+
 추가 패키지 검사:
 
 - 모든 제품 클래스는 Java 8 바이트코드 버전 **52**.
@@ -61,9 +76,9 @@
 
 산출물:
 
-- 설치용: `build/distributions/legacybreaker-0.2.1.jar`
+- 설치용: `build/distributions/legacybreaker-0.3.0.jar`
 - 모델 렌더링: `build/graph-preview.png`
-- 실제 분석 결과 렌더링: `build/integration-preview.png`, `build/jsp-preview.png`
+- 실제 분석 결과 렌더링: `build/integration-preview.png`, `build/jsp-preview.png`, `build/variable-preview.png`
 - 통합 테스트 IDE 로그: `build/test-sandbox/log/idea.log`
 
 테스트는 별도 headless IDE의 실제 서비스와 인덱스를 실행한다.
@@ -78,7 +93,7 @@ JSP 소스 이동 테스트는 테스트 프로젝트의 자동 백그라운드 
 ## 회사 PC 또는 실제 데스크톱에서 확인할 항목
 
 Windows `build.bat` 실행과 실제 GUI 메뉴/클릭 동작은 아직 직접 검증하지 않았다.
-정확한 회사 IDE 버전을 먼저 확인하여 같은 SDK에서 다음을 확인해야 한다.
+지원 대상인 같은 SDK에서 다음을 확인해야 한다.
 
 1. 호환되는 IDE에서 로컬 JAR 설치 후 재시작한다.
 2. Java source root의 `samples/Example.java`에서 `save(int)`에 커서를 두고 우클릭 Action을 실행한다.
@@ -92,5 +107,8 @@ Windows `build.bat` 실행과 실제 GUI 메뉴/클릭 동작은 아직 직접 �
 9. 프로젝트의 기존 Servlet API를 연결하고 `samples/jsp/status.jsp`에서 `status` 선언의 **Trace JSP Value Origin**을 실행한다.
 10. request 읽기와 Controller 후보를 확인하고 점선 노드 설명, 소스 이동, Explore Method Calls를 확인한다.
 11. JSP 수정 후 Refresh Trace, 지원하지 않는 식의 경계 안내, 긴 그래프 스크롤을 확인한다.
+
+12. `samples/VariableExample.java`의 `amount` 이름에서 Explore Variable Relations를 실행한다.
+13. 읽기 5곳/쓰기 2곳/읽기+쓰기 3곳/초기값 1개와 필터, 각 사용 위치로 이동을 확인한다.
 
 2021 또는 최신 IDE에서도 작동한다고 주장하지 않는다. 버전 범위만 넓혀 설치하지 않는다.

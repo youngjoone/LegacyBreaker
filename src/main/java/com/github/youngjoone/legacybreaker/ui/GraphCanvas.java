@@ -208,7 +208,10 @@ public final class GraphCanvas extends JComponent {
         g.draw(new CubicCurve2D.Double(x1, y1, c1, y1, c2, y2, x2, y2));
         arrow(g, x2, y2, right ? 0 : Math.PI);
         if (!CodeEdge.CALLS.equals(edge.type)) {
-            String label = candidate ? "candidate" : edge.type.equals("OUTPUTS") ? "output" : "value";
+            //4차수정: 변수 관계는 읽기/쓰기/초기값 간선을 구분하여 표시한다.
+            String label = candidate ? "candidate" : edge.type.equals("OUTPUTS") ? "output"
+                    : edge.type.equals("READS") ? "read" : edge.type.equals("WRITES") ? "write"
+                    : edge.type.equals("INITIALIZES") ? "init" : "value";
             g.drawString(label, (int) ((x1 + x2) / 2 - g.getFontMetrics().stringWidth(label) / 2), (int) ((y1 + y2) / 2 - 8));
         }
     }

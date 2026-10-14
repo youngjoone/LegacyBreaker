@@ -1,19 +1,20 @@
 # LegacyBreaker — Code Relationship Explorer
 
-Java 8로 구현한 IntelliJ IDEA용 오프라인 Java 메서드 관계 및 JSP 값 출처 탐색 플러그인.
-**V0.2는 기존 Caller/Callee 그래프에 JSP → request 속성 → 자바 작성자 후보 역추적을 추가한다.**
+Java 8로 구현한 IntelliJ IDEA용 오프라인 Java 메서드 관계·변수 사용/변경 위치·JSP 값 출처 탐색 플러그인.
+**V0.3.0은 기존 메서드/JSP 탐색에 Java 변수의 초기값·읽기·쓰기 위치 탐색을 추가한다.**
 
 <!--4차수정: 수정판 안내와 수동 적용 위치.-->
-V0.2.1은 재대입 경로 혼합, 람다 초기값 오판, 작성자 후보 누락을 수정한다.
+앞선 JSP 오류 수정과 이번 변수 탐색을 모두 **4차수정**으로 묶는다.
+새 파일은 첫 줄에 전체 추가임을 표시하고, 기존 파일은 수정 블록 위에 주석을 단다.
 수정 코드에는 `//4차수정` 표시가 있다. [4차 수정 적용 목록](docs/revision-4.md)을 참고한다.
 
-회사 IDE 버전은 아직 미확인이므로 **IntelliJ IDEA 2018.3 (빌드 183)만 임시 지원**한다.
+사용자가 회사 버전과 일치함을 확인한 **IntelliJ IDEA 2018.3 (빌드 183)을 지원 대상**으로 한다.
 그보다 오래되거나 새로운 IDE는 정확한 버전을 확인하고 별도로 맞춰야 한다.
 
 ## 사용 방법
 
 1. 호환되는 IDEA의 `Settings → Plugins → Install Plugin from Disk`에서
-   `build/distributions/legacybreaker-0.2.1.jar`를 설치하고 IDE를 재시작한다.
+   `build/distributions/legacybreaker-0.3.0.jar`를 설치하고 IDE를 재시작한다.
    이 JAR는 독립 실행 프로그램이 아니므로 더블클릭/`java -jar`로 실행하지 않는다.
 2. Java 프로젝트를 열고 메서드 선언 또는 본문에 커서를 둔다.
 3. 에디터 우클릭 → **Explore Code Relations**를 선택한다.
@@ -38,6 +39,19 @@ Root는 녹색 테두리, 선택 노드는 파란색 테두리다. 노드를 끌
 실습 코드는 [samples/Example.java](samples/Example.java)에 있다. `samples`를 Java source root로
 지정하고 `save(int)`에서 시작하면 오버로드·재귀·라이브러리 호출을 볼 수 있다.
 `Store.write()`를 확장하면 `audit()`가 추가된다.
+
+<!--4차수정: Java 변수 탐색 사용법 추가.-->
+## Java 변수의 읽기·변경 위치 찾기
+
+Java 변수 이름에 커서를 두고 우클릭 → **Explore Variable Relations**를 실행한다.
+**Variable Relations** 창에서 선언·초기값·읽기·쓰기·읽기+쓰기 위치를 확인한다.
+지역 변수, 매개변수, 필드를 지원하며 같은 이름의 다른 변수는 구분한다.
+
+**Reads / Changes**로 위치를 나눠 보고 노드 더블클릭으로 해당 코드에 이동한다.
+재대입 위치를 모아 보여주지만 어떤 값이 어떤 읽기에 도달했는지를 계산하지는 않는다.
+메서드 인자·반환값을 따라가는 연결과 DTO/Map 내용 추적은 다음 단계다.
+
+[사용법과 정확한 범위](docs/variable-relations.md), [실습 코드](samples/VariableExample.java).
 
 ## JSP의 JS 변수에서 역추적하기
 
@@ -94,7 +108,7 @@ export LEGACYBREAKER_IDEA="/path/to/intellij"
 ```
 
 macOS IDE 경로는 앱의 `Contents`, JDK 경로는 JDK의 `Contents/Home`을 지정한다.
-결과물은 `build/distributions/legacybreaker-0.2.1.jar`다.
+결과물은 `build/distributions/legacybreaker-0.3.0.jar`다.
 
 IDE 편집 시 소스 루트는 `src/main/java`, 리소스 루트는 `src/main/resources`다.
 기존 Plugin DevKit이 있으면 설치된 IDEA를 SDK로 지정해 편집할 수 있다.
@@ -115,10 +129,11 @@ Java 8 문법 설정만으로 Java 11 기반 SDK를 JDK 8에서 사용할 수는
 - 통합 테스트는 `build/test-sandbox`에 별도 IDE 설정/인덱스를 만든다. 평소 IDE 설정은 변경하지 않는다.
   테스트 전용 starter와 테스트 JAR는 배포물에 포함하지 않는다.
 - JSP 추출, 자바 작성자 후보, 잘못된 연결 배제, 소스 이동, 변경 감지, 새로고침, 취소를 검사한다.
-- 그래프 렌더링 결과: `build/graph-preview.png`, `build/integration-preview.png`, `build/jsp-preview.png`.
+- 변수의 선언 구분, 읽기/쓰기/증감, 필드의 파일 간 검색, 람다 참조, 검색 상한, 필터와 소스 이동을 검사한다.
+- 그래프 렌더링 결과: `build/graph-preview.png`, `build/integration-preview.png`, `build/jsp-preview.png`, `build/variable-preview.png`.
 
 정확한 실행 결과와 수동 확인 목록은 [docs/verification.md](docs/verification.md)에 기록한다.
-회사 버전/Windows에서의 실제 설치와 클릭 동작은 해당 환경에서 별도 확인이 필요하다.
+회사 Windows에서의 실제 설치와 클릭 동작은 해당 환경에서 별도 확인이 필요하다.
 
 설계: [docs/architecture.md](docs/architecture.md).
 개인 PC 검증용 `.local-sdk/`와 `build/`는 Git에서 제외한다.

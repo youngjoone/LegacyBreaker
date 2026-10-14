@@ -1,17 +1,22 @@
 <idea-plugin>
     <id>com.github.youngjoone.legacybreaker</id>
     <name>Code Relationship Explorer</name>
-    <!--4차수정: 역추적 정확성 오류 세 건을 수정한 버전.-->
-    <version>0.2.1</version>
+    <!--4차수정: JSP 오류 수정과 Java 변수 읽기/변경 위치 탐색을 포함한 버전.-->
+    <version>0.3.0</version>
     <vendor>youngjoone</vendor>
-    <description>Offline Java caller/callee graphs and JSP value tracing to candidate request attribute writers, with source navigation.</description>
+    <!--4차수정: 변수 탐색 기능 설명.-->
+    <description>Offline Java caller/callee graphs, variable reads/writes and JSP value tracing to candidate request attribute writers, with source navigation.</description>
 
-    <!-- Provisional target, not a claim of compatibility with the company's IDE. -->
+    <!--4차수정: 사용자가 확인한 회사 IDE 계열. Windows 설치 검증은 별도 진행한다.-->
     <idea-version since-build="183" until-build="183.*"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!--4차수정: 변수 탐색 서비스와 창 추가. 기존 두 탐색 창과 상태를 분리한다.-->
+        <projectService serviceImplementation="com.github.youngjoone.legacybreaker.variable.VariableSession"/>
+        <toolWindow id="Variable Relations" anchor="bottom"
+                    factoryClass="com.github.youngjoone.legacybreaker.variable.VariableToolWindowFactory"/>
         <projectService serviceImplementation="com.github.youngjoone.legacybreaker.session.ExplorationSessionService"/>
         <toolWindow id="Code Relations" anchor="bottom"
                     factoryClass="com.github.youngjoone.legacybreaker.ui.CodeRelationsToolWindowFactory"/>
@@ -21,6 +26,13 @@
     </extensions>
 
     <actions>
+        <!--4차수정: Java 변수 탐색 메뉴 추가.-->
+        <action id="LegacyBreaker.ExploreVariableRelations"
+                class="com.github.youngjoone.legacybreaker.action.ExploreVariableRelationsAction"
+                text="Explore Variable Relations"
+                description="Find a Java variable's initializer, reads and writes">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
         <action id="LegacyBreaker.TraceJspValue"
                 class="com.github.youngjoone.legacybreaker.action.TraceJspValueAction"
                 text="Trace JSP Value Origin"

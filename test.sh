@@ -16,8 +16,8 @@ mkdir -p build/test-classes
 test_sandbox="$PWD/build/test-sandbox"
 rm -rf "$test_sandbox"
 mkdir -p "$test_sandbox/plugins/legacybreaker/lib" "$test_sandbox/plugins/tests/lib" "$test_sandbox/config"
-#4차수정: 수정판 0.2.1을 통합 테스트에 설치한다.
-cp build/distributions/legacybreaker-0.2.1.jar "$test_sandbox/plugins/legacybreaker/lib/"
+#4차수정: 수정판 0.3.0을 통합 테스트에 설치한다.
+cp build/distributions/legacybreaker-0.3.0.jar "$test_sandbox/plugins/legacybreaker/lib/"
 cp -R src/test/resources/. build/test-classes/
 "$LEGACYBREAKER_JDK/bin/jar" cf "$test_sandbox/plugins/tests/lib/tests.jar" -C build/test-classes .
 "$LEGACYBREAKER_JDK/bin/java" -Xmx1024m -Djava.awt.headless=true -Didea.is.internal=true \

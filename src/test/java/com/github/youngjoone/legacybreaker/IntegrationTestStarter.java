@@ -54,6 +54,8 @@ public final class IntegrationTestStarter extends ApplicationStarterEx {
                         () -> ApplicationManager.getApplication().runReadAction(this::analysisTests),
                         new EmptyProgressIndicator());
                 JspIntegrationTest.run(project);
+                //4차수정: 변수 탐색 기능을 같은 실제 IDE 테스트 프로젝트에서 검증한다.
+                VariableIntegrationTest.run(project);
                 sessionTests();
                 System.out.println("PASS: real PSI, reference index, lazy expansion, navigation, stale refresh and cancellation");
                 System.exit(0);
@@ -70,6 +72,8 @@ public final class IntegrationTestStarter extends ApplicationStarterEx {
         Files.copy(Paths.get(System.getProperty("legacybreaker.test.sample")), folder.resolve("src/Example.java"),
                 StandardCopyOption.REPLACE_EXISTING);
         JspIntegrationTest.fixtures(folder);
+        //4차수정: 변수 탐색용 Java 샘플과 대량 참조 fixture를 인덱싱 전에 추가한다.
+        VariableIntegrationTest.fixtures(folder);
         edt(() -> {
             project = ProjectManagerEx.getInstanceEx().newProject("LegacyBreaker Test", folder.toString(), false, false);
             check(project != null, "Project created");
