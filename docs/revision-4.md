@@ -137,4 +137,7 @@ Java 이외 파일은 해당 파일에서 유효한 주석 문법을 사용한�
 일반 반환값과 불일치 경로 후보를 실제 IDEA PSI/인덱스에서 검사한다.
 
 문서 변경은 `README.md`, `docs/jsp-tracing.md`, `docs/architecture.md`,
-`docs/verification.md`, `docs/variable-relations.md` 및 이 문서다. 제품 JAR에는 테스트와 문서가 포함되지 않는다.
+`docs/verification.md`, `docs/variable-relations.md`, `docs/user-guide.md` 및 이 문서다. 제품 JAR에는 테스트와 문서가 포함되지 않는다.
+
+<!--4차수정: 통합 사용자 설명서 안내.-->
+설치부터 시작하려면 [기본 사용 설명서](user-guide.md)를 먼저 확인한다.
